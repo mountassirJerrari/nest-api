@@ -40,9 +40,11 @@ export class RecipeService {
     async create(userId: number, data: CreateRecipeDto) {
         let user: User = await this.userRepo.findOneBy({ id: userId })
 
+
         let recipe: any = this.recipeRepo.create({ ...data, user })
 
         try {
+            
             return await this.recipeRepo.save(recipe);
         } catch (error) {
             if (error instanceof QueryFailedError) {
