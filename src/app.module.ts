@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './entities/User';
-import { Recipe } from './entities/Recipe';
-import { Category } from './entities/Category';
+import { RecipeModule } from './recipe/recipe.module';
 import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
+
 
 @Module({
   imports: [
@@ -19,8 +19,7 @@ import { UserModule } from './user/user.module';
       synchronize: true,
       autoLoadEntities: true,
     }),
-    UserModule
-    ],
+    RecipeModule , UserModule, AuthModule]  ,
   controllers: [AppController, ],
   providers: [AppService,  ],
 })

@@ -1,7 +1,7 @@
-import { HttpCode, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {  HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/User';
-import { CreateUserdto } from 'src/user/dtos/CreateUserDto';
+import { CreateUserdto } from 'src/dtos/CreateUserDto';
 import { QueryFailedError, Repository } from 'typeorm';
 @Injectable()
 export class UserService {
@@ -13,10 +13,17 @@ export class UserService {
     findAll(): Promise<User[]> {
         return this.userRepo.find();
       }
-    
-      findOne(id: number): Promise<User | null> {
-        return this.userRepo.findOneBy({ id });
+      findOne(id: string): Promise<User | null> ;    
+      findOne(id: number): Promise<User | null> ;
+      findOne(id: any): Promise<User | null> {
+        if (typeof id == "number") {
+             this.userRepo.findOneBy({ id });
+
+        }
+        return this.userRepo.findOneBy({ name : id });
+
       }
+      
     
       async remove(id: number): Promise<User> {
         let user  : User = await this.findOne(id) ; 

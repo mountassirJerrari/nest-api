@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Recipe } from 'src/entities/Recipe';
 import { User } from 'src/entities/User';
-import { CreateRecipeDto } from 'src/user/dtos/CreateRecipeDto';
+import { CreateRecipeDto } from 'src/dtos/CreateRecipeDto';
 import { QueryFailedError, Repository } from 'typeorm';
 
 @Injectable()
@@ -40,7 +40,7 @@ export class RecipeService {
     async create(userId: number, data: CreateRecipeDto) {
         let user: User = await this.userRepo.findOneBy({ id: userId })
 
-        let recipe: Recipe = this.recipeRepo.create({ ...data, user })
+        let recipe: any = this.recipeRepo.create({ ...data, user })
 
         try {
             return await this.recipeRepo.save(recipe);
