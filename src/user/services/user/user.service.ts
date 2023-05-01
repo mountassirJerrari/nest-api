@@ -39,7 +39,7 @@ export class UserService {
         return await this.userRepo.save(user);
       } catch (error) {
         if (error instanceof QueryFailedError  ) {
-          throw new HttpException('User with this email already exists' , HttpStatus.BAD_REQUEST);
+          throw new HttpException('User  already exists' , HttpStatus.BAD_REQUEST);
       }   
     }}
 }

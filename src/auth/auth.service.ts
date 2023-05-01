@@ -2,9 +2,11 @@ import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@n
 import { UserService } from 'src/user/services/user/user.service';
 import * as bcrypt from 'bcrypt'
 import { JwtService } from '@nestjs/jwt';
+import { CreateUserdto } from 'src/dtos/CreateUserDto';
 
 @Injectable()
 export class AuthService {
+   
     constructor(private userService: UserService,
         private jwtService: JwtService) {}
 
@@ -18,9 +20,12 @@ export class AuthService {
         throw new UnauthorizedException();
       }
       
-      const payload = { username: user.name, sub: user.id };
+      const payload = { name: user.name, sub: user.id };
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
+  }
+  register(data: CreateUserdto) {
+   return  this.userService.create(data);
   }
 }
