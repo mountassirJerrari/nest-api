@@ -16,6 +16,7 @@ export class RecipeController {
         
         return await this.recipeService.findAll()
     }
+    
     @UseGuards(AuthGuard)
     @Get(':id')
     async getOne(@Param('id', ParseIntPipe) id: number) {
