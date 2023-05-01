@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RecipeModule } from './recipe/recipe.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { CategoryModule } from './category/category.module';
 
 
 @Module({
@@ -19,7 +20,7 @@ import { AuthModule } from './auth/auth.module';
       synchronize: true,
       autoLoadEntities: true,
     }),
-    RecipeModule , UserModule, AuthModule]  ,
+    RecipeModule , UserModule, AuthModule, CategoryModule]  ,
   controllers: [AppController, ],
   providers: [AppService,  ],
 })
