@@ -25,11 +25,12 @@ export class RecipeController {
     @UseGuards(AuthGuard)
     @Post()
     async createrecipe(@Body() data: CreateRecipeDto ,  @Req() req) {
+      
     
         let userId: number = req.user.sub;
        let recipe :Recipe =  await this.recipeService.create(userId, data);
-        return {...recipe , user : { id: req.sub}}
-    }
+        return {...recipe , user : { id : recipe.user.id}
+    }}
     @UseGuards(AuthGuard)
     @Delete(':id')
     async deleterecipe(@Param('id', ParseIntPipe) id: number   ) {

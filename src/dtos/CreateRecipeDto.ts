@@ -1,4 +1,4 @@
-import { IsNotEmpty } from "class-validator";
+import { IsNotEmpty, IsNumber } from "class-validator";
 
 
 export class CreateRecipeDto {
@@ -11,5 +11,8 @@ export class CreateRecipeDto {
     ingredients: string;
     @IsNotEmpty()
     instructions: string;
+    @IsNotEmpty()
+    @IsNumber()
+    categoryId : number ;
 
 }

@@ -4,13 +4,15 @@ import { Recipe } from 'src/entities/Recipe';
 import { User } from 'src/entities/User';
 import { CreateRecipeDto } from 'src/dtos/CreateRecipeDto';
 import { QueryFailedError, Repository } from 'typeorm';
+import { Category } from 'src/entities/Category';
 
 @Injectable()
 export class RecipeService {
 
     constructor(@InjectRepository(Recipe)
     private recipeRepo: Repository<Recipe>, @InjectRepository(User)
-        private userRepo: Repository<User>) {
+        private userRepo: Repository<User> ,@InjectRepository(Category)
+        private categoryRepo: Repository<Category>) {
 
     }
     findAll(): Promise<Recipe[]> {
@@ -37,18 +39,23 @@ export class RecipeService {
 
     }
 
-    async create(userId: number, data: CreateRecipeDto) {
+    async create(userId: number , data: CreateRecipeDto) {
         let user: User = await this.userRepo.findOneBy({ id: userId })
+        let {categoryId , ...recipeData} = data ;
+        let category: Category = await this.categoryRepo.findOneBy({ id: categoryId })
 
-
-        let recipe: any = this.recipeRepo.create({ ...data, user })
+        if (!category) {
+            throw new HttpException("invalid category Id" , HttpStatus.BAD_REQUEST);
+            
+        }
+        let recipe: any = this.recipeRepo.create({ ...recipeData, user , category })
 
         try {
             
             return await this.recipeRepo.save(recipe);
         } catch (error) {
             if (error instanceof QueryFailedError) {
-                throw new HttpException('reciep already exist', HttpStatus.BAD_REQUEST);
+                throw new HttpException('recipe already exist', HttpStatus.BAD_REQUEST);
             }
         }
     }
