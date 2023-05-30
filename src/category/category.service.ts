@@ -1,45 +1,79 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Category } from 'src/entities/Category';
 import { Repository } from 'typeorm';
+import { Category } from '../entities/Category';
+import { CategoryDto } from './dto/category.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { Recipe } from 'src/entities/Recipe';
 
 @Injectable()
 export class CategoryService {
-  constructor(@InjectRepository(Category)
-  private categoryRepo: Repository<Category>){
+  constructor(
+    @InjectRepository(Category)
+    private categoryRepository: Repository<Category>,
+    @InjectRepository(Recipe)
+    private readonly recipeRepository: Repository<Recipe>,
+  ) {}
 
-  }
-  
-  async create(data: CreateCategoryDto) {
-    let category :Category =  this.categoryRepo.create({...data})
-    
-    return await this.categoryRepo.save(category);
-  }
-
-  async findAll() {
-    return await this.categoryRepo.find();
-  }
-
-  async findOne(id: number) {
-    return await this.categoryRepo.findOneBy({id});
+  async getAllCategories(): Promise<CategoryDto[]> {
+    const categories = await this.categoryRepository.find();
+    return categories.map(category => ({
+      id: category.id,
+      name: category.name,
+      image : category.image
+    }));
   }
 
-  async update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    let category :Category =await  this.categoryRepo.findOneBy({id})
+  async getCategoryById(id: number): Promise<CategoryDto> {
+    const category = await this.categoryRepository.findOneBy({id});
     if (!category) {
-      throw new HttpException(`Category with id ${id} not found` , HttpStatus.BAD_REQUEST);
+      throw new NotFoundException(`Category with ID ${id} not found`);
     }
-    category = { ...category ,id , ...updateCategoryDto }
-    return await this.categoryRepo.save(category);
+    return {
+      id: category.id,
+      name: category.name,
+      image : category.image
+    };
   }
 
-  async remove(id: number) {
-    const category = await this.categoryRepo.findOneBy({id});
+  async createCategory(createCategoryDto: CreateCategoryDto): Promise<CategoryDto> {
+    const category = this.categoryRepository.create(createCategoryDto);
+    await this.categoryRepository.save(category);
+    return {
+      id: category.id,
+      name: category.name,
+      image : category.image
+    };
+  }
+
+  async updateCategory(id: number, updateCategoryDto: UpdateCategoryDto): Promise<CategoryDto> {
+    const category = await this.categoryRepository.preload({
+      id,
+      ...updateCategoryDto,
+    });
     if (!category) {
-      throw new HttpException(`Category with id ${id} not found` , HttpStatus.BAD_REQUEST);
+      throw new NotFoundException(`Category with ID ${id} not found`);
     }
-    return await this.categoryRepo.delete(id);
+    await this.categoryRepository.save(category);
+    return {
+      id: category.id,
+      name: category.name,
+      image : category.image
+    };
+  }
+
+  async deleteCategory(id: number): Promise<void> {
+    const category = await this.categoryRepository.findOneBy({id});
+    if (!category) {
+      throw new NotFoundException(`Category with ID ${id} not found`);
+    }
+    await this.categoryRepository.remove(category);
+  }
+  async getRecipesByCategoryId(categoryId: number): Promise<Recipe[]> {
+    return this.recipeRepository.find({
+      where: { category: { id: categoryId }, },relations:['category','media','media.images']
+      
+    });
   }
 }

@@ -20,7 +20,7 @@ export class UserService {
              this.userRepo.findOneBy({ id });
 
         }
-        return this.userRepo.findOneBy({ name : id });
+        return this.userRepo.findOneBy({ username : id });
 
       }
       

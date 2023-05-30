@@ -1,4 +1,3 @@
-// category.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Recipe } from './Recipe';
 
@@ -7,12 +6,13 @@ export class Category {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({unique : true})
+  @Column()
   name: string;
 
   @Column()
-  description: string;
+  image : string ;
 
   @OneToMany(() => Recipe, recipe => recipe.category)
   recipes: Recipe[];
 }
+//

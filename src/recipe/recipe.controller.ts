@@ -1,39 +1,68 @@
-import { Controller, Get, Post, Delete, ParseIntPipe, Body,  Req , Param, UseGuards } from '@nestjs/common';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { CreateRecipeDto } from 'src/dtos/CreateRecipeDto';
-import { Recipe } from 'src/entities/Recipe';
-import { RecipeService } from './services/recipe/recipe.service';
+import { Controller, Get, Post, Query, Body, Param, Put, Delete } from '@nestjs/common';
+import { RecipeService } from './recipe.service';
+import { CreateRecipeDto } from './dto/create-recipe.dto';
+import { UpdateRecipeDto } from './dto/update-recipe.dto';
+import { Ingredient } from 'src/entities/Ingredient';
+import { Comment } from 'src/entities/Comment';
 
 @Controller('recipe')
 export class RecipeController {
-    constructor(private recipeService: RecipeService) {
+  constructor(private readonly recipeService: RecipeService) { }
 
-    }
-    @UseGuards(AuthGuard)
-    @Get()
-    async getAll( @Req() req) {
-        
-        
-        return await this.recipeService.findAll()
-    }
-    
-    @UseGuards(AuthGuard)
-    @Get(':id')
-    async getOne(@Param('id', ParseIntPipe) id: number) {
-        return await this.recipeService.findOne(id)
-    }
-    @UseGuards(AuthGuard)
-    @Post()
-    async createrecipe(@Body() data: CreateRecipeDto ,  @Req() req) {
-      
-    
-        let userId: number = req.user.sub;
-       let recipe :Recipe =  await this.recipeService.create(userId, data);
-        return {...recipe , user : { id : recipe.user.id}
-    }}
-    @UseGuards(AuthGuard)
-    @Delete(':id')
-    async deleterecipe(@Param('id', ParseIntPipe) id: number   ) {
-        return await this.recipeService.remove(id)
-    }
+
+  @Get(':id/comments')
+  async getRecipeComments(@Param('id') recipeId: number): Promise<Comment[]> {
+    return this.recipeService.getRecipeComments(recipeId);
+  }
+
+
+  @Get()
+  async getRecipes(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ) {
+    console.log(page);
+    console.log(limit);
+
+
+    const recipes = await this.recipeService.getPaginatedRecipes(page, limit);
+    return {
+      data: recipes,
+      page,
+      limit,
+    };
+  }
+  @Get()
+  getAllRecipes() {
+    return this.recipeService.getAllRecipes();
+  }
+
+  @Get(':id')
+  getRecipeById(@Param('id') id: number) {
+    return this.recipeService.getRecipeById(id);
+  }
+
+  @Post()
+  createRecipe(@Body() createRecipeDto: CreateRecipeDto) {
+    return this.recipeService.createRecipe(createRecipeDto);
+  }
+
+  @Put(':id')
+  updateRecipe(@Param('id') id: number, @Body() updateRecipeDto: UpdateRecipeDto) {
+    return this.recipeService.updateRecipe(id, updateRecipeDto);
+  }
+
+  @Delete(':id')
+  deleteRecipe(@Param('id') id: number) {
+    return this.recipeService.deleteRecipe(id);
+  }
+  @Get(':id/ingredients')
+  async getRecipeIngredients(@Param('id') recipeId: number): Promise<Ingredient[]> {
+    return this.recipeService.getRecipeIngredients(recipeId);
+  }
+
+  @Get(':id/instructions')
+  async getInstructionsByRecipeId(@Param('id') id: number) {
+    return this.recipeService.getInstructionsByRecipeId(id);
+  }
 }

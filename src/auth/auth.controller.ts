@@ -1,7 +1,7 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res, UseGuards ,Request } from '@nestjs/common';
 import { Request as _Request, Response } from 'express';
-import { CreateUserdto } from 'src/dtos/CreateUserDto';
-import { signInDto } from 'src/dtos/SignInDto';
+import { CreateUserdto } from '../user/dto/CreateUserDto';
+import { signInDto } from '../user/dto/SignInDto';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 
@@ -11,7 +11,7 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @Post('login')
     async signIn(@Body() signInDto: signInDto , @Res() res  : Response ,@Req() req  : _Request) {
-        let token    =await this.authService.signIn(signInDto.name, signInDto.password);
+        let token    =await this.authService.signIn(signInDto.username, signInDto.password);
         console.log(req.headers.authorization);
         
         res.setHeader('Authorization', `Bearer ${token.access_token}`);
